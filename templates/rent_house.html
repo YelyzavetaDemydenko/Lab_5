@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Оренда житла</title>
+</head>
+<body>
+    <h1>Оренда житла | Кабінет орендатора </h1>
+    <h2>Укладання договору оренди</h2>
+    <form method="post" action="/rent_house/{{ house_number }}">
+        Початок оренди: <input type="date" name="start_date"> <br>
+        Кінець оренди: <input type="date" name="end_date"> <br>
+        <br>
+
+        <button type="submit">Відправити</button>
+        <br><br>
+    <a href="/tenant_houses">Назад</a>
+</body>
+</html>

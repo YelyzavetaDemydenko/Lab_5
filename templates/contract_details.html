@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Оренда житла</title>
+</head>
+<body>
+    <h1>Оренда житла | Кабінет орендатора </h1>
+    <h2>Укладання договору оренди</h2>
+    <p>Договір успішно укладено. Деталі договору:</p>
+    <p>Житлове приміщення №{{contract.house_number}}
+    <p>Ціна оренди в місяць: {{contract.house_price}}</p>
+    <p>Орендодавець: {{contract.landlord.name}}, {{contract.landlord.email}}</p>
+    <p>Орендатор: {{contract.tenant.name}}, {{contract.tenant.email}}</p>
+    <p>Термін оренди: з {{contract.start_date}} до {{contract.end_date}}</p>
+    <a href="/tenant">Далі</a>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Оренда житла</title>
+</head>
+<body>
+    <h1>Оренда житла | Кабінет орендатора | Список осель</h1>
+
+    {% if houses %}
+        {% for house in houses %}
+            <p>
+                {{ house }}
+                {% if house.availability %}
+                    | <a href="/rent_house/{{ house.number }}">Орендувати</a>
+                {% else %}
+                    | <span style="color: red;">Житло вже орендоване</span>
+                {% endif %}
+            </p>
+        {% endfor %}
+    {% else %}
+        <p>Поки що немає доданого житла.</p>
+    {% endif %}
+
+    <br>
+    <a href="/tenant">Назад</a>
+
+</body>
+</html>
