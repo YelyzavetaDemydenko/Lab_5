@@ -232,6 +232,7 @@ def rent_house(request: Request, house_number: int, start_date: str = Form(...),
 
     return templates.TemplateResponse("contract_details.html", {"request": request, "contract": contract})
 
+
 @app.get("/confirm_cancel_rent")
 def confirm_cancel_rent(request: Request):
     email = request.cookies.get("tenant_email")
@@ -240,6 +241,7 @@ def confirm_cancel_rent(request: Request):
             tenant_ = tenant
     house = tenant_.rental_house
     return templates.TemplateResponse("confirm_cancel_rent.html", {"request": request, "house": house})
+
 
 @app.get("/cancel_rent")
 def cancel_rent(request: Request):
