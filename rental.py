@@ -58,14 +58,14 @@ def read_houses(filename):
                 list_of_houses.append(House(number = int(row[0]), price = row[1], availability = availability, owner = row[3]))
 
 
-def update_landlord():
+def update_landlords():
     with open("landlords.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.writer(csvfile)
         for landlord in landlords:
             writer.writerow([landlord.email, landlords_accounts[landlord.email], landlord.name])
 
 
-def update_tenant():
+def update_tenants():
     with open("tenants.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.writer(csvfile)
         for tenant in tenants:
@@ -152,6 +152,12 @@ def tenant_edit_email_form(request: Request):
 @app.post("/tenant_edit_email")
 def tenant_edit_email(request: Request, new_email: str = Form(...)):
     old_email = request.cookies.get("tenant_email")
+
+    if new_email == "":
+        return templates.TemplateResponse("tenant_email_error_1.html", {"request": request}, status_code=400)
+    if new_email in tenants_accounts:
+        return templates.TemplateResponse("tenant_email_error_2.html", {"request": request}, status_code=400)
+    
     for tenant in tenants:
         if tenant.email == old_email:
             tenant.email = new_email
@@ -162,7 +168,7 @@ def tenant_edit_email(request: Request, new_email: str = Form(...)):
                     break
 
 
-    update_tenant()
+    update_tenants()
 
     response = RedirectResponse(url="/tenant_info", status_code=302)
     response.set_cookie(key="tenant_email", value=new_email)
@@ -177,11 +183,15 @@ def tenant_edit_email_form(request: Request):
 @app.post("/tenant_edit_name")
 def tenant_edit_email(request: Request, new_name: str = Form(...)):
     email = request.cookies.get("tenant_email")
+
+    if new_name == "":
+        return templates.TemplateResponse("tenant_name_error.html", {"request": request}, status_code=400)
+
     for tenant in tenants:
         if tenant.email == email:
             tenant.name = new_name
 
-    update_tenant()
+    update_tenants()
     
     return RedirectResponse(url="/tenant_info", status_code=302)
 
@@ -193,6 +203,12 @@ def tenant_houses(request: Request):
 
 @app.get("/rent_house/{house_number}")
 def rent_house_form(request: Request, house_number):
+    email = request.cookies.get("tenant_email")
+    for tenant in tenants:
+        if tenant.email == email:
+            tenant_ = tenant
+    if tenant_.rental_house:
+        return templates.TemplateResponse("rent_error.html", {"request": request})
     return templates.TemplateResponse("rent_house.html", {"request": request, "house_number": house_number})
 
 
@@ -211,12 +227,35 @@ def rent_house(request: Request, house_number: int, start_date: str = Form(...),
 
     contract = tenant_.rent_house(house_, landlord_, start_date, end_date)
 
-    update_tenant()
+    update_tenants()
     update_houses()
 
     return templates.TemplateResponse("contract_details.html", {"request": request, "contract": contract})
 
+@app.get("/confirm_cancel_rent")
+def confirm_cancel_rent(request: Request):
+    email = request.cookies.get("tenant_email")
+    for tenant in tenants:
+        if tenant.email == email:
+            tenant_ = tenant
+    house = tenant_.rental_house
+    return templates.TemplateResponse("confirm_cancel_rent.html", {"request": request, "house": house})
 
+@app.get("/cancel_rent")
+def cancel_rent(request: Request):
+    email = request.cookies.get("tenant_email")
+    for tenant in tenants:
+        if tenant.email == email:
+            tenant_ = tenant
+
+    house_ = tenant_.rental_house
+    tenant_.rental_house = None
+    house_.availability = True
+
+    update_houses()
+    update_tenants()
+
+    return RedirectResponse(url="/tenant_info", status_code=HTTP_302_FOUND)
 
 
 @app.get("/register_landlord")
@@ -283,6 +322,12 @@ def landlord_edit_email_form(request: Request):
 @app.post("/landlord_edit_email")
 def landlord_edit_email(request: Request, new_email: str = Form(...)):
     old_email = request.cookies.get("landlord_email")
+
+    if new_email == "":
+        return templates.TemplateResponse("landlord_email_error_1.html", {"request": request}, status_code=400)
+    if new_email in landlords_accounts:
+        return templates.TemplateResponse("landlord_email_error_2.html", {"request": request}, status_code=400)
+
     for landlord in landlords:
         if landlord.email == old_email:
             landlord.email = new_email
@@ -297,7 +342,7 @@ def landlord_edit_email(request: Request, new_email: str = Form(...)):
     for house in landlord_.list_of_houses:
         house.owner = landlord_.email
 
-    update_landlord()
+    update_landlords()
     if landlord_.list_of_houses:
         update_houses()
 
@@ -314,11 +359,15 @@ def landlord_edit_email_form(request: Request):
 @app.post("/landlord_edit_name")
 def landlord_edit_email(request: Request, new_name: str = Form(...)):
     email = request.cookies.get("landlord_email")
+
+    if new_name == "":
+        return templates.TemplateResponse("landlord_name_error.html", {"request": request}, status_code=400)
+
     for landlord in landlords:
         if landlord.email == email:
             landlord.name = new_name
 
-    update_landlord()
+    update_landlords()
     
     return RedirectResponse(url="/landlord_info", status_code=302)
 
@@ -391,7 +440,7 @@ def delete_house(request: Request, house_number):
     for tenant in tenants:
         if tenant.rental_house == house_:
             tenant.rental_house = None
-            update_tenant()
+            update_tenants()
             break 
 
     return RedirectResponse(url="/landlord_houses", status_code=302)

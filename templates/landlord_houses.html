@@ -13,7 +13,7 @@
             <p>
                 {{ house }}
                 {% if not house.availability %}
-                    <span style="color: forestgreen;">Орендар: {{ tenant.name }}, {{ tenant.email }}</span>
+                    <span style="color: forestgreen;">Орендатор: {{ tenant.name }}, {{ tenant.email }}</span>
                 {% endif %}
                 | <a href="/confirm_delete_house/{{ house.number }}">Видалити</a>
             </p>

@@ -51,8 +51,8 @@ class House():
         self.__availability = availability
 
     def __str__(self):
-        availability_str = "Є в наявності." if self.availability else "Немає в наявності."
-        return f"Житло №{self.number}. Ціна: {self.price}. {availability_str}. Власник: {self.owner}"
+        availability_str = "Є в наявності" if self.availability else "Немає в наявності"
+        return f"Житло №{self.number}. Ціна: {self.price}. {availability_str}. Власник: {self.owner}."
 
 class Tenant():
     """Клас орендатор"""
